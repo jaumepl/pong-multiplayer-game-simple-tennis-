@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Tennis app";
+}
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>
+
+        </title>
+    </head>
+    <p></p>
+    <body>
+        <div>
+            @if (!@Program.SharedObj.inicialized)
+            {
+                <a href="/Home/StartGame">Start game</a>
+            }
+            else
+            {
+                <canvas id="canvas" width="650" height="400" style="border-style: double;border-color: black"></canvas>
+            }
+        </div>
+    </body>
+</html>

@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - tennis1</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">tennis1</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                </ul>
+                @await Html.PartialAsync("_LoginPartial")
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2018 - tennis multiusuari per Jaume Planas</p>
+        </footer>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/signalr.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+        <script src="~/js/signalr.min.js"></script>
+    </environment>
+    <script>
+    if (canvas!=null){
+        var W = canvas.width;
+        var H = canvas.height;
+        var ballX = W/2;
+        var ballY = H/2;
+        var ballSpeedX = 0;
+        var ballSpeedY = 0;
+        var paddle1Y = 150;
+        var paddle2Y = 150;
+        var winningScreenShowed = false;
+        var stopped = false;
+        var requestId = 0;
+        var computerLevel = 9; //range 0 - 10
+
+        var playerScore = 0;
+        var computerScore = 0;
+
+        const WINNING_SCORE = 3;
+        const PADDLE_HEIGHT = 100;
+        const PADDLE_THICKNESS = 10;
+
+        $(document).ready(function () {
+            let transportType = signalR.TransportType.WebSockets;
+            let http = new signalR.HttpConnection(`http://${document.location.host}/hub`, { transport: transportType });
+            let connection = new signalR.HubConnection(http);
+            connection.start();
+
+            // let connection = new signalR.HubConnection('/hub');
+
+            connection.on('setGamePositions', message => {
+                setGamePositions1(message.item1,message.item2,message.item3,message.item4);
+            });
+
+            function setGamePositions1 (leftPaddle, rigthPaddle, ballPosX, ballPosY) {
+                paddle1Y = leftPaddle;
+                ballX = ballPosX;
+                ballY = ballPosY;
+            };
+
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');  
+        
+        function loop(){
+            if (!stopped) {
+            moveEverything();
+                drawEverything();
+                requestId = window.requestAnimationFrame(loop);
+                }
+        }
+
+        function start() {
+            requestId = window.requestAnimationFrame(loop);
+            stopped = false;
+        }
+        
+        function stop() {
+            if (requestId) {
+            window.cancelAnimationFrame(requestId);
+            }
+            stopped = true;
+        }
+        
+        start();
+        
+        /*canvas.addEventListener('mousemove', function(e){
+            var mousePos = calculateMousePos(e);
+            paddle1Y = mousePos.y - (PADDLE_HEIGHT/2);
+        });*/
+        
+        canvas.addEventListener('click', function(){
+            if(!winningScreenShowed){
+            return;
+            }
+            winningScreenShowed = false;
+            playerScore = 0;
+            computerScore = 0;
+        });
+
+        function getRadomNumber(min, max){
+            return Math.random() * (max - min) + min;
+        }
+        
+        function computerMovement(){
+            var speed = Math.abs(ballSpeedY);
+            if(speed>computerLevel){
+            console.log(speed);
+            } 
+            var indent = (speed > computerLevel) ? -10 :40;
+            paddle2Y = ballY-indent;
+        }
+        
+        function moveEverything(){   
+            if(winningScreenShowed){
+            return;
+            }
+            var hitThePaddle1 = (ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT);
+            var hitThePaddle2 = (ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT);
+            computerMovement();
+            ballX = ballX + ballSpeedX;//del servidor
+            ballY = ballY + ballSpeedY;
+            if(ballX > W-20){
+            if(hitThePaddle2){
+                ballSpeedX = -ballSpeedX;
+            }else if(ballX > W){
+                        playerScore++;
+                resetBall();
+            }
+            }
+            if(ballX < 20){
+            if(hitThePaddle1){
+                ballSpeedX = -ballSpeedX;
+                var deltaY = ballY - (paddle1Y + (PADDLE_HEIGHT/2));
+                ballSpeedY = deltaY * 0.2;
+            }else if(ballX < 0){
+                computerScore++;
+                resetBall();
+                stop();
+                setTimeout(function(){
+                start();
+                }, 1000);
+            }
+            }
+            if(ballY > H){
+            ballSpeedY = -ballSpeedY;
+            }
+            if(ballY < 0){
+            ballSpeedY = -ballSpeedY;
+            }
+        };
+
+        function drawNet(){
+            for(var i = 0; i < H; i+=40){
+            drawRect(W/2-1, i, 2, 20, 'white');
+            }
+        };
+        
+        function drawEverything(){
+            drawRect(0, 0, W, H, 'white');
+            drawNet();    
+            drawRect(1, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
+            drawRect(W-PADDLE_THICKNESS-1, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'grey');
+            drawCircle(ballX, ballY, 5, 'black');
+            /*if(winningScreenShowed){
+            ctx.fillStyle = 'black';
+            if(playerScore == WINNING_SCORE){
+                ctx.fillText('Has guanyat!', 100, 100);
+            }else if(computerScore >= WINNING_SCORE){
+                ctx.fillText('Ha guanyat l´ordinador!', W-150, 100);  
+            }
+            ctx.fillText('click per continuar', 300, 310);
+            return;
+            }*/
+            ctx.fillStyle = 'black';
+            //ctx.fillText(playerScore, 100, 100);
+            //ctx.fillText(computerScore, W-100, 100);
+        }
+
+        function drawRect(x, y, w, h, color){
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, w, h);
+        }
+
+        function drawCircle(x, y, rad, color){
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, rad, 0, Math.PI * 2, false);
+            ctx.fill();
+        }
+
+        function calculateMousePos(e){
+            var rect = canvas.getBoundingClientRect();
+            var root = document.documentElement;
+            var mouseX = e.clientX - rect.left - root.scrollLeft;
+            var mouseY = e.clientY - rect.top - root.scrollTop;
+            return {
+            x: mouseX,
+            y: mouseY
+            }
+        }
+        
+        function resetBall(){
+            if(playerScore == WINNING_SCORE || computerScore == WINNING_SCORE){
+            winningScreenShowed = true;
+            }
+            ballX = W/2;
+            ballY = H/2;
+            ballSpeedY = 0;
+            paddle2Y = 150;
+            paddle1Y = 150;
+        }
+        });
+    }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
