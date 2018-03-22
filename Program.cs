@@ -15,6 +15,7 @@ namespace tennis1
 {
     public class Program
     {
+        //common shared objects
         public static IHubContext<tennisHub> globalHubContext;
         public static TennisGame SharedObj = new TennisGame(650,400,640/2, 480/2,1.0f,1.0f, false);
 
