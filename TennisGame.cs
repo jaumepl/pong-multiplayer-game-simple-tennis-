@@ -74,7 +74,7 @@ namespace tennis1
                 }
                 if (Program.globalHubContext != null)
                 {
-                    Program.globalHubContext.Clients.All.SendAsync("setGamePositions", (0, 0, ballX, ballY));
+                    Program.globalHubContext.Clients.All.SendAsync("setGamePositions", (Program.SharedObj.palaEsquerra, 0, ballX, ballY));
                 }
                 //leftMouseX, leftMouseY, rigthMouseX, rightMouseY, ballPosX, ballPosY
             }

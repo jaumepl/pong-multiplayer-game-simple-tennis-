@@ -69,6 +69,14 @@
         <script src="~/js/signalr.min.js"></script>
     </environment>
     <script>
+    var baixaPala = false;
+    var pujaPala = false;
+    function palaAbaix() {
+        baixaPala = true;
+    }
+    function palaAmunt() {
+        pujaPala = true;
+    }
     if (canvas!=null){
         var W = canvas.width;
         var H = canvas.height;
@@ -91,6 +99,20 @@
         const PADDLE_THICKNESS = 10;
 
         $(document).ready(function () {
+            function invoke(connection, method, ...args) {
+                var argsArray = Array.prototype.slice.call(arguments);
+                connection.invoke.apply(connection, argsArray.slice(1))
+                        .then(result => {
+                            console.log("invocation completed successfully: " + (result === null ? '(null)' : result));
+
+                            if (result) {
+                                addLine('message-list', result);
+                            }
+                        })
+                        .catch(err => {
+                            addLine('message-list', err, 'red');
+                        });
+            }
             let transportType = signalR.TransportType.WebSockets;
             let http = new signalR.HttpConnection(`http://${document.location.host}/hub`, { transport: transportType });
             let connection = new signalR.HubConnection(http);
@@ -113,7 +135,15 @@
         
         function loop(){
             if (!stopped) {
-            moveEverything();
+                if (baixaPala) {
+                    invoke(connection, "palaAbaix");
+                    baixaPala = false;
+                }
+                if (pujaPala) {
+                    invoke(connection, "palaAmunt");
+                    pujaPala = false;
+                }
+                moveEverything();
                 drawEverything();
                 requestId = window.requestAnimationFrame(loop);
                 }
