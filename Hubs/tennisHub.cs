@@ -18,6 +18,6 @@ namespace personal.Hubs
         public void palaAmunt()
         {
             Program.SharedObj.palaEsquerra -= 10;
-        }
+        }       
     }
 }

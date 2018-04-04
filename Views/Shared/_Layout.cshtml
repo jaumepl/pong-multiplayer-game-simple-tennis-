@@ -77,6 +77,9 @@
     function palaAmunt() {
         pujaPala = true;
     }
+    function guanyaDreta() {
+        computerScore++;
+    }
     if (canvas!=null){
         var W = canvas.width;
         var H = canvas.height;
@@ -121,13 +124,15 @@
             // let connection = new signalR.HubConnection('/hub');
 
             connection.on('setGamePositions', message => {
-                setGamePositions1(message.item1,message.item2,message.item3,message.item4);
+                setGamePositions1(message.item1,message.item2,message.item3,message.item4, message.item5, message.item6);
             });
 
-            function setGamePositions1 (leftPaddle, rigthPaddle, ballPosX, ballPosY) {
+            function setGamePositions1 (leftPaddle, rigthPaddle, ballPosX, ballPosY, leftWins, rightWins) {
                 paddle1Y = leftPaddle;
                 ballX = ballPosX;
                 ballY = ballPosY;
+                playerScore = leftWins;
+                computerScore = rightWins;
             };
 
             var canvas = document.getElementById('canvas');
@@ -241,6 +246,7 @@
             drawRect(1, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
             drawRect(W-PADDLE_THICKNESS-1, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'grey');
             drawCircle(ballX, ballY, 5, 'black');
+            $("#marcador").text(playerScore+ "-" + computerScore);
             /*if(winningScreenShowed){
             ctx.fillStyle = 'black';
             if(playerScore == WINNING_SCORE){

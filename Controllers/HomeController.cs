@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using personal.Hubs;
@@ -21,8 +22,9 @@ namespace tennis1.Controllers
         {
             //_hubContext = hubContext;
             _context = context;
-            Program.globalHubContext = hubContext;
+            Program.GlobalHubContext = hubContext;
         }
+        [Authorize]
         public IActionResult Index()
         {
             return View();

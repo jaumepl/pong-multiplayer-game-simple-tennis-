@@ -8,6 +8,8 @@ namespace tennis1
 {
     public class TennisGame
     {
+        public int LeftWins { get; set; }
+        public int RighttWins { get; set; }
         public int Alt_Y { get; set; }
 
         public int Ample_X { get; set; }
@@ -19,6 +21,16 @@ namespace tennis1
         public float palaDreta { get; set; }
         public float palaEsquerra { get; set; }
         public bool inicialized { get; set; }
+        public int numberOfPlayers { get; set; }
+
+        //initial values
+
+        private int _Initial_Ample_X;
+        private int _Initial_Alt_Y;
+        private float _Initial_ballX;
+        private float _Initial_ballY;
+        private float _Initial_ballSpeedX;
+        private float _Initial_ballSpeedY;
 
         public TennisGame(int tAmple_X, int tAlt_Y, float tballX, float tballY,
                         float tballSpeedX, float tballSpeedY, bool tinicialized)
@@ -30,10 +42,32 @@ namespace tennis1
             ballSpeedX = tballSpeedX;
             ballSpeedY = tballSpeedY;
             inicialized = tinicialized;
+
+            _Initial_Ample_X = tAmple_X;
+            _Initial_Alt_Y = tAlt_Y;
+            _Initial_ballX = tballX;
+            _Initial_ballY = tballY;
+            _Initial_ballSpeedX = tballSpeedX;
+            _Initial_ballSpeedY = tballSpeedY;
+            inicialized = tinicialized;
+        }
+
+        public void restart()
+        {
+            Ample_X = _Initial_Ample_X;
+            Alt_Y = _Initial_Alt_Y;
+            ballX = _Initial_ballX;
+            ballY = _Initial_ballY;
+            ballSpeedX = _Initial_ballSpeedX;
+            ballSpeedY = _Initial_ballSpeedY;
+            palaDreta = Alt_Y / 2;
+            palaEsquerra = Alt_Y / 2;
         }
 
         public void start()
         {
+            RighttWins = 0;
+            LeftWins = 0;
             palaDreta = Alt_Y / 2;
             palaEsquerra = Alt_Y / 2;
             while (!Program.SharedObj.inicialized)
@@ -63,18 +97,33 @@ namespace tennis1
                 }
                 if (ballX <= 0)
                 {
-                    //de moment tot rebota
-                    ballSpeedX = -ballSpeedX;
-                    ballX = 0;
+                    RighttWins += 1;
+                    restart();
+                }
+                if (ballX >= Ample_X)
+                {
+                    //TODO: guaya esquerra
+                    ballSpeedX = 0;
+                    ballSpeedY = 0;
                 }
                 if (ballY <= 0)
                 {
                     ballSpeedY = -ballSpeedY;
                     ballY = 0;
                 }
-                if (Program.globalHubContext != null)
+                if (ballX <= 10 && ballX >= 1 && ballY >= palaEsquerra && ballY <= palaEsquerra + 100)
                 {
-                    Program.globalHubContext.Clients.All.SendAsync("setGamePositions", (Program.SharedObj.palaEsquerra, 0, ballX, ballY));
+                    ballSpeedX = -ballSpeedX;
+                }
+                if (ballX <= Ample_X - 1 && ballX >= Ample_X - 10 && ballY >= palaDreta && ballY <= palaDreta + 100)
+                {
+                    ballSpeedX = -ballSpeedX;
+                }
+                if (Program.GlobalHubContext != null)
+                {
+                    Program.GlobalHubContext.Clients.All
+                        .SendAsync("setGamePositions", 
+                            (Program.SharedObj.palaEsquerra, 0, ballX, ballY, LeftWins, RighttWins));
                 }
                 //leftMouseX, leftMouseY, rigthMouseX, rightMouseY, ballPosX, ballPosY
             }
