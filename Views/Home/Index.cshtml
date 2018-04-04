@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Tennis app";
 }
+@inject UserManager<ApplicationUser> UserManager
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>
@@ -16,12 +17,34 @@
             }
             else
             {
+                if (Program.SharedObj.namePlayer1 != null && Program.SharedObj.namePlayer2 ==  null 
+                    && Program.SharedObj.namePlayer1 !=  UserManager.GetUserName(User))
+                {
+                    Program.SharedObj.namePlayer2 = UserManager.GetUserName(User);
+                }
+                if (Program.SharedObj.namePlayer1 == null)
+                {
+                    Program.SharedObj.namePlayer1 = UserManager.GetUserName(User);
+                }
+                <div>
+                    <label> Jugador 1:<label><label id="playerLeft">@Program.SharedObj.namePlayer1</label>
+                    <label> Jugador 2:<label><label id="playerRight">@Program.SharedObj.namePlayer2</label>
+                </div>                
                 <div>
                     <label>Marcador:</label><label id="marcador">0-0</label>
                 </div>
                 <canvas id="canvas" width="650" height="400" style="border-style: double;border-color: black"></canvas>
-                <button onclick="palaAmunt()">Pala amunt</button>
-                <button onclick="palaAbaix()">Pala abaix</button>
+                @if (Program.SharedObj.namePlayer2 == UserManager.GetUserName(User)){
+                    <button onclick="palaAmuntDreta()">Pala amunt</button>
+                
+                    <button onclick="palaAbaixDreta()">Pala abaix</button>                
+                }
+                else
+                {
+                    <button onclick="palaAmuntEsq()">Pala amunt</button>
+                
+                    <button onclick="palaAbaixEsq()">Pala abaix</button> 
+                }
             }
         </div>
     </body>

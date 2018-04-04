@@ -21,7 +21,8 @@ namespace tennis1
         public float palaDreta { get; set; }
         public float palaEsquerra { get; set; }
         public bool inicialized { get; set; }
-        public int numberOfPlayers { get; set; }
+        public string namePlayer1 { get; set; }
+        public string namePlayer2 { get; set; }
 
         //initial values
 
@@ -52,29 +53,38 @@ namespace tennis1
             inicialized = tinicialized;
         }
 
-        public void restart()
+        public void restart(int dir)
         {
             Ample_X = _Initial_Ample_X;
             Alt_Y = _Initial_Alt_Y;
             ballX = _Initial_ballX;
             ballY = _Initial_ballY;
-            ballSpeedX = _Initial_ballSpeedX;
+            ballSpeedX = (dir)*_Initial_ballSpeedX;
             ballSpeedY = _Initial_ballSpeedY;
-            palaDreta = Alt_Y / 2;
-            palaEsquerra = Alt_Y / 2;
+            palaDreta = Alt_Y / 2 - 50;
+            palaEsquerra = Alt_Y / 2  - 50;
         }
 
         public void start()
         {
             RighttWins = 0;
             LeftWins = 0;
-            palaDreta = Alt_Y / 2;
-            palaEsquerra = Alt_Y / 2;
+            palaDreta = Alt_Y / 2 - 50;
+            palaEsquerra = Alt_Y / 2 - 50;
             while (!Program.SharedObj.inicialized)
             {
                 Thread.Sleep(1000);
             }
-
+            Program.GlobalHubContext.Clients.All
+                .SendAsync("setGameDetails",
+                    (0, 0, Program.SharedObj.namePlayer1, "Waiting for player 2"));
+            while (Program.SharedObj.namePlayer1 == null || Program.SharedObj.namePlayer2 == null)
+            {
+                Thread.Sleep(1000);
+            }
+            Program.GlobalHubContext.Clients.All
+                .SendAsync("setGameDetails",
+                    (0, 0, Program.SharedObj.namePlayer1, Program.SharedObj.namePlayer2));
             while (true)
             {
                 Thread.Sleep(10);
@@ -98,13 +108,18 @@ namespace tennis1
                 if (ballX <= 0)
                 {
                     RighttWins += 1;
-                    restart();
+                    Program.GlobalHubContext.Clients.All
+                        .SendAsync("setGameDetails",
+                        (LeftWins, RighttWins, Program.SharedObj.namePlayer1, Program.SharedObj.namePlayer2));
+                    restart(-1);
                 }
                 if (ballX >= Ample_X)
                 {
-                    //TODO: guaya esquerra
-                    ballSpeedX = 0;
-                    ballSpeedY = 0;
+                    LeftWins += 1;
+                    Program.GlobalHubContext.Clients.All
+                        .SendAsync("setGameDetails",
+                        (LeftWins, RighttWins, Program.SharedObj.namePlayer1, Program.SharedObj.namePlayer2));
+                    restart(1);
                 }
                 if (ballY <= 0)
                 {
@@ -122,8 +137,8 @@ namespace tennis1
                 if (Program.GlobalHubContext != null)
                 {
                     Program.GlobalHubContext.Clients.All
-                        .SendAsync("setGamePositions", 
-                            (Program.SharedObj.palaEsquerra, 0, ballX, ballY, LeftWins, RighttWins));
+                        .SendAsync("setGamePositions",
+                            (Program.SharedObj.palaEsquerra, Program.SharedObj.palaDreta, ballX, ballY));
                 }
                 //leftMouseX, leftMouseY, rigthMouseX, rightMouseY, ballPosX, ballPosY
             }
