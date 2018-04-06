@@ -158,19 +158,19 @@
             function loop(){
                 if (!stopped) {
                     if (baixaPalaDreta) {
-                        invoke(connection, "palaAbaixDreta");
+                        invoke(connection, "palaAbaixDreta",0);
                         baixaPalaDreta = false;
                     }
                     if (pujaPalaDreta) {
-                        invoke(connection, "palaAmuntDreta");
+                        invoke(connection, "palaAmuntDreta",0);
                         pujaPalaDreta = false;
                     }                
                     if (baixaPalaEsq) {
-                        invoke(connection, "palaAbaixEsq");
+                        invoke(connection, "palaAbaixEsq",0);
                         baixaPalaEsq = false;
                     }
                     if (pujaPalaEsq) {
-                        invoke(connection, "palaAmuntEsq");
+                        invoke(connection, "palaAmuntEsq",0);
                         pujaPalaEsq = false;
                     }
                     //moveEverything();

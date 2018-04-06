@@ -25,6 +25,7 @@ namespace tennis1.Controllers
             Program.GlobalHubContext = hubContext;
         }
         [Authorize]
+        //[Route("[controller]/{id}")]
         public IActionResult Index()
         {
             return View();
@@ -52,7 +53,7 @@ namespace tennis1.Controllers
         [Authorize]
         public IActionResult StartGame()
         {
-            Program.SharedObj.inicialized = true;
+            Program.SharedObj[0].inicialized = true;
 
             return RedirectToAction(nameof(Index));
         }

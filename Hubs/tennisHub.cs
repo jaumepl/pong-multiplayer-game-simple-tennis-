@@ -14,21 +14,21 @@ namespace personal.Hubs
 
         }
 
-        public void palaAbaixEsq()
+        public void palaAbaixEsq(int id)
         {
-            Program.SharedObj.palaEsquerra += 10;
+            Program.SharedObj[id].palaEsquerra += 10;
         }        
-        public void palaAbaixDreta()
+        public void palaAbaixDreta(int id)
         {
-            Program.SharedObj.palaDreta += 10;
+            Program.SharedObj[id].palaDreta += 10;
         }
-        public void palaAmuntEsq()
+        public void palaAmuntEsq(int id)
         {
-            Program.SharedObj.palaEsquerra -= 10;
+            Program.SharedObj[id].palaEsquerra -= 10;
         }         
-        public void palaAmuntDreta()
+        public void palaAmuntDreta(int id)
         {
-            Program.SharedObj.palaDreta -= 10;
+            Program.SharedObj[id].palaDreta -= 10;
         }       
     }
 }

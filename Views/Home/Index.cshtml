@@ -11,30 +11,30 @@
     <p></p>
     <body>
         <div>
-            @if (!@Program.SharedObj.inicialized)
+            @if (!@Program.SharedObj[0].inicialized)
             {
                 <a href="/Home/StartGame">Start game</a>
             }
             else
             {
-                if (Program.SharedObj.namePlayer1 != null && Program.SharedObj.namePlayer2 ==  null 
-                    && Program.SharedObj.namePlayer1 !=  UserManager.GetUserName(User))
+                if (Program.SharedObj[0].namePlayer1 != null && Program.SharedObj[0].namePlayer2 ==  null 
+                    && Program.SharedObj[0].namePlayer1 !=  UserManager.GetUserName(User))
                 {
-                    Program.SharedObj.namePlayer2 = UserManager.GetUserName(User);
+                    Program.SharedObj[0].namePlayer2 = UserManager.GetUserName(User);
                 }
-                if (Program.SharedObj.namePlayer1 == null)
+                if (Program.SharedObj[0].namePlayer1 == null)
                 {
-                    Program.SharedObj.namePlayer1 = UserManager.GetUserName(User);
+                    Program.SharedObj[0].namePlayer1 = UserManager.GetUserName(User);
                 }
                 <div>
-                    <label> Jugador 1:<label><label id="playerLeft">@Program.SharedObj.namePlayer1</label>
-                    <label> Jugador 2:<label><label id="playerRight">@Program.SharedObj.namePlayer2</label>
+                    <label> Jugador 1:<label><label id="playerLeft">@Program.SharedObj[0].namePlayer1</label>
+                    <label> Jugador 2:<label><label id="playerRight">@Program.SharedObj[0].namePlayer2</label>
                 </div>                
                 <div>
                     <label>Marcador:</label><label id="marcador">0-0</label>
                 </div>
                 <canvas id="canvas" width="650" height="400" style="border-style: double;border-color: black"></canvas>
-                @if (Program.SharedObj.namePlayer2 == UserManager.GetUserName(User)){
+                @if (Program.SharedObj[0].namePlayer2 == UserManager.GetUserName(User)){
                     <button onclick="palaAmuntDreta()">Pala amunt</button>
                 
                     <button onclick="palaAbaixDreta()">Pala abaix</button>                

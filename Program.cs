@@ -17,7 +17,15 @@ namespace tennis1
     {
         //common shared objects
         public static IHubContext<tennisHub> GlobalHubContext;
-        public static TennisGame SharedObj = new TennisGame(650,400,640/2, 480/2,1.0f,1.0f, false);
+        public static List<TennisGame> SharedObj = new List<TennisGame>();
+
+        public static void addAndRunNewTennisGame(TennisGame newTennisGame)
+        {
+            SharedObj.Add(newTennisGame);  
+            ThreadStart gamePlaying = new ThreadStart(newTennisGame.start);
+            Thread gameThread = new Thread(gamePlaying);
+            gameThread.Start();
+        }
 
         public static void Main(string[] args)
         {
@@ -27,9 +35,7 @@ namespace tennis1
             webThread.Start();
 
             //Instanciar del webPage un IHubContext<progressHub> hubContext
-            ThreadStart gamePlaying = new ThreadStart(SharedObj.start);
-            Thread gameThread = new Thread(gamePlaying);
-            gameThread.Start();
+            addAndRunNewTennisGame(new TennisGame(0, 650,400,640/2, 480/2,1.0f,1.0f, false));
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
