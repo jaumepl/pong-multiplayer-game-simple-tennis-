@@ -6,4 +6,4 @@ VS Code project, install it and load the folder with the project.
 
 Add C# component, restart VS and add whatever asked to when trying to run.
 
-Modify the connectionstring properly to an installed db.
+Modify the connectionstring properly to an installed db in appsettings.json file.
